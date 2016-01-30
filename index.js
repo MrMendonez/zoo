@@ -1,6 +1,6 @@
 var mysql = require('mysql');
 var connection = mysql.createConnection({
-    host: 'localhost',
+    host: 'localhost', // how do I test if host, user, and pw are correct?
     user: 'root',
     password: '',
     database: 'zoo_db'
@@ -18,4 +18,5 @@ connection.connect(function(err) {
 
 prompt.message = "";
 
-//Finished Part 1. Tried running on terminal. No response. It just hangs as if it is trying to do something.
+//Finished Part 1. Tried running on terminal. No response. Cursor just blinks and waits for a command. Is that what is supposed to happen at this point?
+
