@@ -132,6 +132,43 @@ var zoo = {
   }, // end update key
   adopt: function(input_scope) {
     var currentScope = input_scope;
-    prompt.get() // Cafe closing... To be continued...
-  }
+    prompt.get(['->', 'animal_id'], function(err, result) {
+      connection.query(); // delete it from the animals table. Is this coded correctly?
+      currentScope.visit();
+      currentScope.view(currentScope);
+    }) // end prompt. get
+  }, // end adopt key
+  promptUser: function() {
+    var self = this;
+    prompt.get('input', function(err, result) {
+      if(result.input == "Q") {
+        self.exit();
+      }
+      else if(result.input == "A") {
+        self.add(self);
+      }
+      else if(result.input == "V") {
+        self.visit();
+        self.view(self); // does this function belong here or is it supposed to be in its own else if statement? HW directions are unclear.
+      }
+      // instructions are incomplete. Not sure what to do with self.view(self)
+      else if(result.input == "D") {
+        self.adopt(self);
+      }
+      else {
+        console.log("Sorry, not sure what you meant. What would you like to do?");
+      }
+    }) // end prompt.get
+  }, //end promptUser key
+  exit: function() {
+    console.log("Thank you for visiting us, good bye~!");
+    process.exit();
+  }, // end exit key
+  open: function() {
+    this.welcome();
+    this.menu();
+    this.promptUser();
+  } // end open key
 };
+
+zoo.open();
