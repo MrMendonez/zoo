@@ -84,9 +84,13 @@ var zoo = {
   }, // end view key
   type: function(input_scope) {
     var currentScope = input_scope;
-    console.log("Enter animal type to find how many animals we have of those type.");
+    console.log("Enter animal type to find how many animals we have of that type.");
     prompt.get(['->', 'animal_type'], function(err, result) {
-      connection.query(); // gives a count of the animals of this type. Is this coded correctly?
+      connection.query('SELECT COUNT(*) AS total FROM `animals` WHERE `type` = ?', [result.animal_type], function(err, results, fields) {
+        if (err) throw err;
+       
+        console.log('Total animals of that type: ' + results[0].total);
+      });
       currentScope.menu();
       currentScope.promptUser();
     }) // end prompt.get
@@ -96,7 +100,11 @@ var zoo = {
     console.log("New York City or San Francisco?");
     console.log("Choose a city: (NY) or (SF).");
     prompt.get(['->', 'city_name'], function(err, result) {
-      connection.query(); //call the function connection.query() with a string in the form of a mySQL select the number of animals that all the caretakers from the specific user inputed city. Is this coded correctly?
+      connection.query('SELECT COUNT(*) AS total FROM animals, caretakers WHERE animals.caretaker_id = caretakers.id AND caretakers.city = ?', [result.city_name], function(err, results, fields) {
+        if (err) throw err;
+       
+        console.log('Total animals in that location: ' + results[0].total);
+      });
       currentScope.visit();
       currentScope.view(currentScope);
     }) // end prompt.get
@@ -105,7 +113,16 @@ var zoo = {
     var currentScope = input_scope;
     console.log("Enter ID of the animal you want to visit.");
     prompt.get(['->', 'animal_id'], function(err, result) {
-      connection.query(); // gets the data for the particular animal of that id that the user typed in. Is this coded correctly?
+      connection.query('SELECT * FROM animals WHERE id = ?', [result.animal_id], function(err, results, fields) {
+        if (err) throw err;
+        else {
+          console.log('Animal ID: ' + results[0].id);
+        console.log('Caretaker ID: ' + results[0].caretaker_id);
+        console.log('Name: ' + results[0].name);
+        console.log('Animal Type: ' + results[0].type);
+        console.log('Age: ' + results[0].age);
+        }
+      });
       currentScope.visit();
       currentScope.view(currentScope);
     }) // end prompt.get
@@ -114,22 +131,55 @@ var zoo = {
     var currentScope = input_scope;
     console.log("Enter name of the animal you want to visit.");
     prompt.get(['->', 'animal_name'], function(err, result) { // is 'animal_name' the correct string here?
-      connection.query(); // gets the data for the particular animal of that id that the user typed in. Is this coded correctly?
+      connection.query('SELECT * FROM animals WHERE name = ?', [result.animal_name], function(err, results, fields) {
+        if (err) throw err;
+        else {
+          console.log('Animal ID: ' + results[0].id);
+          console.log('Caretaker ID: ' + results[0].caretaker_id);
+          console.log('Name: ' + results[0].name);
+          console.log('Animal Type: ' + results[0].type);
+          console.log('Age: ' + results[0].age);
+        }
+      });
       currentScope.visit();
       currentScope.view(currentScope);
     }) // end prompt.get
   }, // end name key
   all: function(input_scope) {
-    connection.query(); // gets total of all animals regardless of type.
+    connection.query('SELECT COUNT(*) AS total FROM animals', function(err, results, fields) {
+      if (err) throw err;
+      else {
+        console.log('Total number of animals: ' + JSON.stringify(results[0].total));
+      }
+    });
   }, // end all key
+  preUpdate: function(input_scope) {
+    var currentScope = input_scope;
+    console.log('Update by ID or name?');
+    var userChoice;
+    prompt.get(['IdOrName'], function(err, result) {
+      userChoice = result.IdOrName;
+      currentScope.update(currentScope, userChoice);
+    });
+  }, // end preUpdate key
   update: function(input_scope) {
     var currentScope = input_scope;
     prompt.get(['--->','id','new_name','new_age','new_type','new_caretaker_id'], function(err, result) {
-      connection.query(); // updates that particular animal with the input the user provided. Is this coded correctly?
+      var update_animal = {name: result.new_name, age: result.new_age, type: result.new_type, caretaker_id: result.new_caretaker_id};
+      var query = connection.query('UPDATE animals SET ? WHERE name = ?', [update_animal, result.old_name], function(err, results) {
+        if (err) throw err;
+      }); //update that particular animal with the input the user provided
+      console.log(query.sql);
       currentScope.menu();
       currentScope.promptUser();
     }) // end prompt.get
   }, // end update key
+
+
+  // continue with adopt key
+
+
+
   adopt: function(input_scope) {
     var currentScope = input_scope;
     prompt.get(['->', 'animal_id'], function(err, result) {
