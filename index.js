@@ -174,19 +174,15 @@ var zoo = {
       currentScope.promptUser();
     }) // end prompt.get
   }, // end update key
-
-
-  // continue with adopt key
-
-
-
   adopt: function(input_scope) {
     var currentScope = input_scope;
     prompt.get(['->', 'animal_id'], function(err, result) {
-      connection.query(); // delete it from the animals table. Is this coded correctly?
-      currentScope.visit();
-      currentScope.view(currentScope);
-    }) // end prompt. get
+      connection.query('DELETE FROM animals WHERE id = ?', result.animal_id, function(err, results, fields) {
+        if (err) throw err;
+      }); //update that particular animal with the input the user provided
+      currentScope.menu();
+      currentScope.promptUser();
+    }); // end prompt. get
   }, // end adopt key
   promptUser: function() {
     var self = this;
@@ -204,6 +200,9 @@ var zoo = {
       // instructions are incomplete. Not sure what to do with self.view(self)
       else if(result.input == "D") {
         self.adopt(self);
+      }
+      else if (result.input == 'U') {
+        self.preUpdate(self);
       }
       else {
         console.log("Sorry, not sure what you meant. What would you like to do?");
