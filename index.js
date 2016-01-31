@@ -19,8 +19,6 @@ connection.connect(function(err) {
 
 prompt.message = "";
 
-//Finished Part 1. Tried running on terminal. No response. Cursor just blinks and waits for a command. Is that what is supposed to happen at this point?
-
 var that = this;
 
 var zoo = {
@@ -38,7 +36,12 @@ var zoo = {
     var currentScope = input_scope;
     console.log("To add an animal to the zoo please fill out the following form for us!");
     prompt.get(['->', 'name', 'type', 'age'], function(err, result) {
-      connection.query(); // takes the user's input and inserts it into the animal's table. Is this line coded correctly?
+      var randCaretaker = Math.floor(Math.random() * 10) + 1;
+      var new_animal = {caretaker_id: randCaretaker, name: result.name, type: result.type, age: result.age};
+      var query = connection.query('INSERT INTO animals SET ?', new_animal, function(err, result) {
+        if(err) {throw err}
+      });
+      console.log(query.sql);
       currentScope.menu();
       currentScope.promptUser();
     }) // end prompt.get
